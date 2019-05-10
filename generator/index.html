@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+        function getPromise(ms,cb){
+            return new Promise((resolve,reject)=>{
+                setTimeout(function(){
+                    cb();
+                    resolve(ms);
+                },ms)
+            })
+        }
+
+        function * generator(){
+            var a = yield getPromise(1000,()=>{console.log('第一次执行generator函数')});
+            console.log('...a',a)
+            var b = yield getPromise(3000,()=>{console.log('第二次执行generator函数')});
+            console.log('...b',b)
+        }
+        //第一次调用返回执行器
+        // let gen = generator();
+        // //next函数返回一个对象 value表示yield后表达式的值，done表示函数执行状态
+        // console.log('第一次调用',gen.next()) //{value: 1, done: false}
+        // //下一次next()调用传入的值是上一次调用的放回值
+        // console.log('第二次调用',gen.next(100)) //{value: 2, done: false}
+
+        // console.log('第三次调用',gen.next()) //{value: undefined, done: true}
+
+        function run(generator){
+            let gen = generator();
+            function next(data){
+                //调用next获取generator函数的执行状态
+                let result = gen.next(data);
+                // console.log('result...',result.value)
+                //判断generator函数是否执行结束
+                if(result.done){
+                    return result.value;
+                }else{
+                    //判断yield后面是否是promise
+                    if(result.value.then){
+                        result.value.then(res => next(res))
+                    }else{
+                        next(result.value)
+                    }   
+                   
+                }
+            }
+            next();
+        }
+        console.log(run(generator))
+    </script>
+</body>
+</html>
