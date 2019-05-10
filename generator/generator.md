@@ -69,3 +69,22 @@
 > 2.for ... of
 
     for of循环迭代generator对象,这种方式不需要我们自己判断done
+    function* fib(max) {
+        var t,
+            a = 0,
+            b = 1,
+            n = 0;
+        while (n < max) {
+            yield a;
+            [a, b] = [b, a + b];
+            n ++;
+        }
+        return;
+    }
+    for (var x of fib(10)) {
+        console.log(x); // 依次输出0, 1, 1, 2, 3, ...
+    }
+
+## generator和普通函数相比，有什么用？
+
+    因为generator可以在执行过程中多次返回，所以它看上去就像一个可以记住执行状态的函数，利用这一点，写一个generator就可以实现需要用面向对象才能实现的功能,generator还有另一个巨大的好处，就是把异步回调代码变成“同步”代码
